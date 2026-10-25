@@ -1,5 +1,5 @@
 /** Seeded procedural world generation: terrain regions, rivers, assets and fair starts. */
-import { BALANCE, PERSONAS, PLAYER_COLORS, TERRAINS, WEATHERS } from './config';
+import { BALANCE, PERSONAS, PLAYER_COLORS, STRUCTURES, TERRAINS, WEATHERS } from './config';
 import { fbm, hash2, makeRng, newRngState, valueNoise } from './rng';
 import { computePriceFor, rollForecast, weatherById } from './markets';
 import { manhattan, neighbors4, reveal, tileAt } from './board';
@@ -301,10 +301,38 @@ function placeStart(state: GameState, playerId: number, start: Tile): void {
   const open = owned
     .filter((t) => t !== start && !t.structure)
     .sort((a, b) => hash2(a.x, a.y, playerId) - hash2(b.x, b.y, playerId));
-  const solarTile = open[0] ?? start;
-  const dcTile = open[1] ?? open[0] ?? start;
-  if (solarTile !== start) solarTile.structure = { kind: 'solar', owner: playerId, builtTurn: 0 };
-  if (dcTile !== start) dcTile.structure = { kind: 'edge', owner: playerId, builtTurn: 0, policy: 'compute' };
+  // A start must always be able to host both a solar farm and an edge site.
+  const spare = state.tiles
+    .filter(
+      (t) =>
+        t !== start &&
+        !t.structure &&
+        TERRAINS[t.terrain].land &&
+        (t.owner === null || t.owner === playerId) &&
+        Math.abs(t.x - start.x) + Math.abs(t.y - start.y) <= 2 &&
+        !open.includes(t),
+    )
+    .sort(
+      (a, b) =>
+        Math.abs(a.x - start.x) + Math.abs(a.y - start.y) - (Math.abs(b.x - start.x) + Math.abs(b.y - start.y)) ||
+        hash2(a.x, a.y, playerId) - hash2(b.x, b.y, playerId),
+    );
+  while (open.length < 2 && spare.length) {
+    const tile = spare.shift();
+    if (!tile) break;
+    tile.owner = playerId;
+    open.push(tile);
+  }
+  const solarTile = open.find((t) => STRUCTURES.solar.terrains.includes(t.terrain)) ?? open[0] ?? start;
+  if (solarTile !== start) {
+    if (!STRUCTURES.solar.terrains.includes(solarTile.terrain)) solarTile.terrain = 'plains';
+    solarTile.structure = { kind: 'solar', owner: playerId, builtTurn: 0 };
+  }
+  const dcTile = open.find((t) => t !== solarTile && STRUCTURES.edge.terrains.includes(t.terrain)) ?? open.find((t) => t !== solarTile) ?? start;
+  if (dcTile !== start) {
+    if (!STRUCTURES.edge.terrains.includes(dcTile.terrain)) dcTile.terrain = 'plains';
+    dcTile.structure = { kind: 'edge', owner: playerId, builtTurn: 0, policy: 'compute' };
+  }
   reveal(state, playerId, start.x, start.y, 4);
 }
 

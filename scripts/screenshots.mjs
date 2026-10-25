@@ -74,11 +74,19 @@ const built = await page.evaluate(() => {
   const tile = game.tiles[sel.y * game.size + sel.x];
   return tile?.structure ? 'already' : tile?.owner;
 });
+let builtAfter = null;
 if (built === 0) {
   const option = page.locator('.build-option:not([disabled])').first();
   if (await option.count()) {
     await option.click();
     await page.waitForTimeout(650);
+    builtAfter = await page.evaluate(() => {
+      const gp = window.__gp;
+      const st = gp.useGame.getState();
+      const game = st.game;
+      const sel = st.selected;
+      return sel ? game.tiles[sel.y * game.size + sel.x]?.structure?.kind ?? null : null;
+    });
   }
 }
 await page.screenshot({ path: 'screenshots/07-claim-build.png' });
@@ -179,6 +187,6 @@ await winPage.evaluate(() => {
 await winPage.waitForTimeout(900);
 await winPage.screenshot({ path: 'screenshots/17-victory.png' });
 
-console.log(JSON.stringify({ target, claimed, built, errors }, null, 2));
+console.log(JSON.stringify({ target, claimed, built: builtAfter ?? built, errors }, null, 2));
 await browser.close();
 server.stop();

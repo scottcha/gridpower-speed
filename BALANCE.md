@@ -96,7 +96,7 @@ Command: `npm run sim -- seeds=10 turns=40 size=20 base=3000`. All four seats ar
 | 3021 | Compute dominance | Volt Dynamics | 36 |
 | 3028 | Compute dominance | Volt Dynamics | 30 |
 | 3035 | Score | Helios Energy | 40 |
-| 3042 | Score | Lumen Grid | 40 |
+| 3042 | Score | Helios Energy | 40 |
 | 3049 | Score | Titan Compute | 40 |
 | 3056 | Score | Titan Compute | 40 |
 | 3063 | Score | Titan Compute | 40 |
@@ -106,17 +106,19 @@ Aggregates:
 | Metric | Value |
 |---|---:|
 | Matches | 10 |
-| Average turns | 38.3 |
-| Average runtime per match | 141 ms |
-| Average winner compute | 616 CU |
-| Average leader treasury | $18,487 |
-| Average structures on the map | 146 |
+| Average turns | 38.2 |
+| Average runtime per match | 134 ms |
+| Average winner compute | 604 CU |
+| Average leader treasury | $18,747 |
+| Average structures on the map | 145 |
 | Average technologies per company | 11.5 |
 | Score victories | 7 |
 | Compute victories | 3 |
 | Crashes / stalls / runaway resources | 0 |
 
-Win split: Titan Compute 5 (4 score, 1 compute), Helios Energy 2 (score), Volt Dynamics 2 (compute), Lumen Grid 1 (score).
+Win split: Titan Compute 5 (4 score, 1 compute), Helios Energy 3 (score), Volt Dynamics 2 (compute). The fourth seat uses the Helios persona and did not win this set.
+
+These numbers were produced on the shipped build, including the 600 MW / $9,000 energy threshold and the start-asset terrain guarantee.
 
 **Interpretation.** Titan's compute-first strategy is the most consistent in symmetric AI play; Volt's storage/flexibility plan converts early market share into two compute wins; Helios survives to the score finish with the largest generation fleet. The AI league does not produce energy or technology victories because those require a deliberate multi-turn commitment that the heuristic planner does not pursue opportunistically — both are checked by engine tests and are reachable for a focused human. The variety of endings and the absence of crashes, stalls or runaway treasuries made this set the shipping balance.
 

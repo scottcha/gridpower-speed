@@ -47,17 +47,22 @@ describe('world generation', () => {
   });
 
   it('gives every company a connected starter kit and surveyed ground', () => {
-    const state = fresh(7, 18);
+    for (const seed of [7, 31, 77]) {
+    const state = fresh(seed, 18);
     for (const player of state.players) {
       const { sub, dc, solar } = startTiles(state, player.id);
       expect(sub.structure?.kind).toBe('substation');
       expect(dc.structure?.kind).toBe('edge');
       expect(solar.structure?.kind).toBe('solar');
+      // Starting assets must obey the same terrain rules as player-built ones.
+      expect(STRUCTURES.edge.terrains).toContain(dc.terrain);
+      expect(STRUCTURES.solar.terrains).toContain(solar.terrain);
       expect(Math.abs(dc.x - sub.x) + Math.abs(dc.y - sub.y)).toBeLessThanOrEqual(BALANCE.attachRadius);
       expect(Math.abs(solar.x - sub.x) + Math.abs(solar.y - sub.y)).toBeLessThanOrEqual(BALANCE.attachRadius);
       const owned = state.tiles.filter((t) => t.owner === player.id);
       expect(owned.length).toBeGreaterThanOrEqual(3);
       expect(state.tiles.filter((t) => (t.revealed & (1 << player.id)) !== 0).length).toBeGreaterThan(10);
+    }
     }
   });
 
