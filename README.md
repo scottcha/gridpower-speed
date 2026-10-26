@@ -182,3 +182,29 @@ Progress autosaves to `localStorage` (`gridpower.save.v1`) after every action an
 - Audio is synthesized in WebAudio; there are no recorded assets.
 
 All artwork, maps, names and audio in this project are original and generated procedurally.
+
+---
+
+## Session summary
+
+**SESSION SUMMARY — b839acbefedd3f0a02f938cd (deepseek-v4.1-flash, default tier)**
+
+Window: 2026-10-25 02:18:44 → 02:48:55 UTC (30.4 min wall, 10.3 min busy, 5.20 turns/min)
+
+Tokens (158 turns, 156 tool_calls + 2 stop):
+- prompt 71,885,972 | cached 70,396,544 (97.9% hit) | uncached 1,489,428 | completion 178,047
+
+Energy & cost:
+- 0.120599 kWh | billed $0.0000 — ARTIFACT, not free: every turn reports `charged_energy_kwh > 0` with `cost_usd = 0` (pricing path stamped zero; likely the dsv4f free-use daily grant, which resets 00:00 UTC, or a zero-multiplier promo). Like-priced energy charge at $5.00/kWh: $0.6030.
+- Token-card equivalent at listed rates: $1.3862.
+
+Latency / throughput:
+- TTFT p50 1.21s, p90 2.08s, p99 6.1s, max 9.8s
+- Per-turn generation TPS (turns with ≥1s decode, n=93): mean 467 | p10 343 | p50 449 | p90 632 | max 813
+- Session-aggregate TPS: 460.5 generation basis / 97.6 wall-clock
+
+Pool co-tenancy (other-customer same-model standard-pool rows, NULL tier coalesced):
+- 20,871 rows fleet-wide in window. Concurrent others at arrivals: median 8, p90 13, max 22 — every turn shared the pool. Earlier "ran alone" reading was a query bug (NULL priority_tier excluded); corrected above.
+
+Head-to-head vs speed session (same base model, ~same task shape):
+- decode p50 449 vs 615 tps (-27%), wall-clock 97.6 vs 168.9 (-42%), TTFT tail better (p99 6.1s vs 14.1s) — busier pool but flatter latency; energy per 1k output tokens 0.68 vs 0.48 Wh (-42% efficiency for default).
